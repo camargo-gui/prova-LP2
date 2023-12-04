@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Form, Button, Spinner } from 'react-bootstrap';
+import { Container, Form, Button, Spinner, Alert } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { cadastrarUsuario } from '../redux/user-reducer';
 import STATE from '../resources/state';
@@ -10,6 +10,7 @@ export const User = () => {
     const [nickname, setNickname] = useState("");
     const [urlAvatar, seturlAvatar] = useState("");
     const [exibirSpinner, setExibirSpinner] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
 
     const userState = useSelector((state) => state.user);
 
@@ -18,10 +19,10 @@ export const User = () => {
         if (userState.state === STATE.OCIOSO && userState.mensagem !== "") {
             setNickname("");
             seturlAvatar("");
-            alert(userState.mensagem);
+            setShowAlert(true);
         }
         if(userState.state === STATE.ERRO){
-            alert(userState.mensagem);
+            setShowAlert(true);
         }
         if(userState.state === STATE.PENDENTE){
             setExibirSpinner(true)
@@ -63,6 +64,7 @@ export const User = () => {
     return (
         <Container>
             <h2>Cadastro de Usuário</h2>
+            {showAlert && <Alert variant="success" onClose={() => setShowAlert(false)} dismissible>{userState.mensagem}</Alert>}
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="nickname">
                     <Form.Label>Nickname</Form.Label>

@@ -76,7 +76,6 @@ export const editarMensagem = createAsyncThunk("message/put", async (message) =>
         if (data.status) {
             return {
                 status: true,
-                id: data.id,
                 mensagem: data.mensagem
             }
         }

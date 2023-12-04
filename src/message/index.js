@@ -16,7 +16,7 @@ export const Message = () => {
         dispatch(buscarUsuario());
         dispatch(buscarMensagens());
     }, [])
-    
+
     useEffect(() => {
         setShowAlert(true)
     }, [mensagemState.mensagem])
@@ -33,8 +33,14 @@ export const Message = () => {
         const now = new Date();
         const difference = now.getTime() - timestamp.getTime();
         const differenceInMinutes = difference / (1000 * 60);
-        console.log(differenceInMinutes)
         return differenceInMinutes < 5;
+    }
+
+    const handleView = async (id) => {
+        await dispatch(editarMensagem({
+            lido: true,
+            id: id
+        }))
     }
 
     const handleUsuarioChange = (e) => {
@@ -106,27 +112,32 @@ export const Message = () => {
                 ) : (
                     <Card>
                         <Card.Body>
-                            {mensagensRecebidas.map((mensagem, index) => (
-                                <Row key={index} className="mb-2">
-                                    <Col md="auto">
-                                        <Image src={mensagem.usuario.urlAvatar}
-                                            roundedCircle style={{ width: '30px', height: '30px' }} />
-                                    </Col>
-                                    <Col>
-                                        <strong>{mensagem.usuario.nickname}:</strong> {mensagem.mensagem}
-                                    </Col>
-                                    {canBeEdited(mensagem.dataHora) &&
+                            {mensagensRecebidas.map((mensagem, index) => {
+                                if (mensagem.lida === false) {
+                                    //handleView(mensagem.id);
+                                }
+                                return (
+                                    <Row key={index} className="mb-2">
                                         <Col md="auto">
-                                            <Button variant="danger" size="sm"
-                                                onClick={() => {
-                                                    handleExcluir(mensagem.id)
-                                                }}>
-                                                Excluir
-                                            </Button>
-                                        </Col>}
-                                </Row>
+                                            <Image src={mensagem.usuario.urlAvatar}
+                                                roundedCircle style={{ width: '30px', height: '30px' }} />
+                                        </Col>
+                                        <Col>
+                                            <strong>{mensagem.usuario.nickname}:</strong> {mensagem.mensagem}
+                                        </Col>
+                                        {canBeEdited(mensagem.dataHora) &&
+                                            <Col md="auto">
+                                                <Button variant="danger" size="sm"
+                                                    onClick={() => {
+                                                        handleExcluir(mensagem.id)
+                                                    }}>
+                                                    Excluir
+                                                </Button>
+                                            </Col>}
+                                    </Row>
 
-                            ))}
+                                )
+                            })}
                         </Card.Body>
                     </Card>
                 )}
