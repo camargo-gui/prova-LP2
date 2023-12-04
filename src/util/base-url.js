@@ -1,0 +1,1 @@
+export const baseUrl = "https://backend-bcc-2-b.vercel.app";
