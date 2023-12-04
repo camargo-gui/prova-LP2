@@ -27,7 +27,7 @@ export const User = () => {
         if(userState.state === STATE.PENDENTE){
             setExibirSpinner(true)
         }
-    }, [userState.state]);
+    }, [userState.state, userState.mensagem]);
 
     const dispatch = useDispatch();
 

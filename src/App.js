@@ -13,6 +13,7 @@ function App() {
             <Route path="/user" element={<User />} />
             <Route path="/message" element={<Message />} />
             <Route path="/" element={<Menu />} />
+            <Route path="/prova-LP2" element={<Menu />} />
           </Routes>
         </BrowserRouter>
       </Provider>

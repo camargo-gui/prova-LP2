@@ -3,7 +3,7 @@ import { Container, Form, Button, Card, Row, Col, Image, Alert } from 'react-boo
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { buscarUsuario } from '../redux/user-reducer';
-import { DeletarMensagem, buscarMensagens, editarMensagem, enviarMensagem } from '../redux/message-reducer';
+import { DeletarMensagem, buscarMensagens, enviarMensagem } from '../redux/message-reducer';
 
 export const Message = () => {
     const usuarios = useSelector((state) => state.user.lista);
@@ -15,11 +15,11 @@ export const Message = () => {
     useEffect(() => {
         dispatch(buscarUsuario());
         dispatch(buscarMensagens());
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         setShowAlert(true)
-    }, [mensagemState.mensagem])
+    }, [mensagemState.mensagem, dispatch])
 
     const [usuarioSelecionado, setUsuarioSelecionado] = useState('');
     const [mensagem, setMensagem] = useState('');
@@ -36,12 +36,12 @@ export const Message = () => {
         return differenceInMinutes < 5;
     }
 
-    const handleView = async (id) => {
-        await dispatch(editarMensagem({
-            lido: true,
-            id: id
-        }))
-    }
+    // const handleView = async (id) => {
+    //     await dispatch(editarMensagem({
+    //         lido: true,
+    //         id: id
+    //     }))
+    // }
 
     const handleUsuarioChange = (e) => {
         setUsuarioSelecionado(e.target.value);
