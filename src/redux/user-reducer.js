@@ -4,7 +4,6 @@ import { baseUrl } from "../util/base-url.js";
 
 export const cadastrarUsuario = createAsyncThunk("user/post", async (user) => {
     try {
-        console.log("chegou aqui")
         const response = await fetch(baseUrl + "/usuario", {
             method: "POST",
             headers: {

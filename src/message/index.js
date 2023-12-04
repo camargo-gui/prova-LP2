@@ -1,90 +1,136 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Form, Button, Card } from 'react-bootstrap';
+import { Container, Form, Button, Card, Row, Col, Image, Alert } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { buscarUsuario } from '../redux/user-reducer';
+import { DeletarMensagem, buscarMensagens, editarMensagem, enviarMensagem } from '../redux/message-reducer';
 
 export const Message = () => {
-  const usuarios = useSelector((state) => state.user.lista);
-  const mensagensRecebidas = useSelector((state) => state.message.lista);
-  const dispatch = useDispatch();
+    const usuarios = useSelector((state) => state.user.lista);
+    const mensagensRecebidas = useSelector((state) => state.message.lista);
+    const mensagemState = useSelector((state) => state.message);
+    const [showAlert, setShowAlert] = useState(false);
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(buscarUsuario());
-  }, [])
+    useEffect(() => {
+        dispatch(buscarUsuario());
+        dispatch(buscarMensagens());
+    }, [])
+    
+    useEffect(() => {
+        setShowAlert(true)
+    }, [mensagemState.mensagem])
 
-  const [usuarioSelecionado, setUsuarioSelecionado] = useState('');
-  const [mensagem, setMensagem] = useState('');
+    const [usuarioSelecionado, setUsuarioSelecionado] = useState('');
+    const [mensagem, setMensagem] = useState('');
 
-  const handleUsuarioChange = (e) => {
-    setUsuarioSelecionado(e.target.value);
-  };
+    function canBeEdited(timestampString) {
+        const [datePart, timePart] = timestampString.split(', ');
+        const [day, month, year] = datePart.split('/');
+        const reorganizedTimestampString = `${month}/${day}/${year}, ${timePart}`;
+        const timestamp = new Date(reorganizedTimestampString);
+        timestamp.setHours(timestamp.getHours() - 3);
+        const now = new Date();
+        const difference = now.getTime() - timestamp.getTime();
+        const differenceInMinutes = difference / (1000 * 60);
+        console.log(differenceInMinutes)
+        return differenceInMinutes < 5;
+    }
 
-  const handleMensagemChange = (e) => {
-    setMensagem(e.target.value);
-  };
-
-  const handleEnviarMensagem = (e) => {
-    e.preventDefault();
-
-    // Simulação de envio de mensagem
-    const novaMensagem = {
-      remetente: usuarioSelecionado,
-      conteudo: mensagem,
+    const handleUsuarioChange = (e) => {
+        setUsuarioSelecionado(e.target.value);
     };
 
-    setMensagensRecebidas([...mensagensRecebidas, novaMensagem]);
+    const handleMensagemChange = (e) => {
+        setMensagem(e.target.value);
+    };
 
-    setMensagem('');
-  };
+    const handleExcluir = async (id) => {
+        dispatch(DeletarMensagem({
+            id: id
+        }))
+        dispatch(buscarMensagens());
+    }
 
-  return (
-    <Container>
-      <h2>Enviar Mensagem</h2>
-      <Form onSubmit={handleEnviarMensagem}>
-        <Form.Group controlId="usuario">
-          <Form.Label>Selecione o Usuário</Form.Label>
-          <Form.Control as="select" value={usuarioSelecionado} onChange={handleUsuarioChange}>
-            <option value="">Selecione um usuário</option>
-            {usuarios.map((usuario) => (
-              <option key={usuario.id} value={usuario.nickname}>
-                {usuario.nickname}
-              </option>
-            ))}
-          </Form.Control>
-        </Form.Group>
+    const handleEnviarMensagem = async (e) => {
+        e.preventDefault();
 
-        <Form.Group controlId="mensagem">
-          <Form.Label>Digite a Mensagem</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Digite sua mensagem"
-            value={mensagem}
-            onChange={handleMensagemChange}
-          />
-        </Form.Group>
+        const novaMensagem = {
+            mensagem: mensagem,
+            usuario: {
+                id: usuarioSelecionado
+            }
+        }
+        await dispatch(enviarMensagem(novaMensagem));
 
-        <Button variant="primary" type="submit">
-          Enviar
-        </Button>
-      </Form>
+        dispatch(buscarMensagens());
+        setMensagem('');
+    };
 
-      <div className="mt-4">
-        <h2>Mensagens Recebidas</h2>
-        {mensagensRecebidas.length === 0 ? (
-          <p>Nenhuma mensagem recebida.</p>
-        ) : (
-          <Card>
-            <Card.Body>
-              {mensagensRecebidas.map((mensagem, index) => (
-                <Card.Text key={index}>
-                  <strong>{mensagem.remetente}:</strong> {mensagem.conteudo}
-                </Card.Text>
-              ))}
-            </Card.Body>
-          </Card>
-        )}
-      </div>
-    </Container>
-  );
+    return (
+        <Container>
+            <h2>Enviar Mensagem</h2>
+            <Alert variant="success" show={showAlert} onClose={() => setShowAlert(false)} dismissible>{mensagemState.mensagem}</Alert>
+            <Form onSubmit={handleEnviarMensagem}>
+                <Form.Group controlId="usuario">
+                    <Form.Label>Selecione o Usuário</Form.Label>
+                    <Form.Control as="select" value={usuarioSelecionado} onChange={handleUsuarioChange}>
+                        <option value="">Selecione um usuário</option>
+                        {usuarios.map((usuario) => (
+                            <option key={usuario.id} value={usuario.id}>
+                                {usuario.nickname}
+                            </option>
+                        ))}
+                    </Form.Control>
+                </Form.Group>
+
+                <Form.Group controlId="mensagem">
+                    <Form.Label>Digite a Mensagem</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Digite sua mensagem"
+                        value={mensagem}
+                        onChange={handleMensagemChange}
+                    />
+                </Form.Group>
+
+                <Button variant="primary" type="submit">
+                    Enviar
+                </Button>
+            </Form>
+
+            <div className="mt-4">
+                <h2>Mensagens Recebidas</h2>
+                {mensagensRecebidas.length === 0 ? (
+                    <p>Nenhuma mensagem recebida.</p>
+                ) : (
+                    <Card>
+                        <Card.Body>
+                            {mensagensRecebidas.map((mensagem, index) => (
+                                <Row key={index} className="mb-2">
+                                    <Col md="auto">
+                                        <Image src={mensagem.usuario.urlAvatar}
+                                            roundedCircle style={{ width: '30px', height: '30px' }} />
+                                    </Col>
+                                    <Col>
+                                        <strong>{mensagem.usuario.nickname}:</strong> {mensagem.mensagem}
+                                    </Col>
+                                    {canBeEdited(mensagem.dataHora) &&
+                                        <Col md="auto">
+                                            <Button variant="danger" size="sm"
+                                                onClick={() => {
+                                                    handleExcluir(mensagem.id)
+                                                }}>
+                                                Excluir
+                                            </Button>
+                                        </Col>}
+                                </Row>
+
+                            ))}
+                        </Card.Body>
+                    </Card>
+                )}
+            </div>
+        </Container>
+    );
 };
