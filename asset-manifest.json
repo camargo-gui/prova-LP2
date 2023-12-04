@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/prova-LP2/static/css/main.241951ba.css",
+    "main.js": "/prova-LP2/static/js/main.b3d084e3.js",
+    "index.html": "/prova-LP2/index.html",
+    "main.241951ba.css.map": "/prova-LP2/static/css/main.241951ba.css.map",
+    "main.b3d084e3.js.map": "/prova-LP2/static/js/main.b3d084e3.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.241951ba.css",
+    "static/js/main.b3d084e3.js"
+  ]
+}
